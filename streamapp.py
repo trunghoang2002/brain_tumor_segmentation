@@ -1,5 +1,6 @@
 from keras.models import load_model
 from custom_objects import bce_dice_loss, iou_metric
+from unetpp_sharpness import model_unetplusplus
 import streamlit as st
 import numpy as np
 from PIL import Image
@@ -19,11 +20,13 @@ class ModelName(str, Enum):
 # Function to load the selected model
 def load_selected_model(model_name):
     if model_name == ModelName.unet:
-        return load_model('models/model_best_checkpoint_unet_agumentaion.h5', custom_objects={'bce_dice_loss': bce_dice_loss, 'iou_metric': iou_metric})
+        return load_model('models/model_best_checkpoint_unet_agumentation.h5', custom_objects={'bce_dice_loss': bce_dice_loss, 'iou_metric': iou_metric})
     elif model_name == ModelName.unetpp:
         return load_model('models/model_best_checkpoint_unet++_agumentation.h5', custom_objects={'bce_dice_loss': bce_dice_loss, 'iou_metric': iou_metric})
     elif model_name == ModelName.unetpp_s:
-        return load_model('models/model_best_checkpoint_unet++sharpness_agumentation.h5', custom_objects={'bce_dice_loss': bce_dice_loss, 'iou_metric': iou_metric})
+        model = model_unetplusplus
+        model.load_weights('models/model_best_checkpoint_unet++sharpness_agumentation.h5')
+        return model
 
 # Sidebar for selecting the model
 model_option = st.sidebar.selectbox("Select Model", [ModelName.unet, ModelName.unetpp, ModelName.unetpp_s])
