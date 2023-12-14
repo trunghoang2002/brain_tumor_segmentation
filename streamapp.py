@@ -14,20 +14,19 @@ st.write("This app segments brain tumors from MRI images")
 class ModelName(str, Enum):
     unet = "Unet"
     unetpp = "Unet++"
-    model3 = "Model 3"
+    unetpp_s = "Unet++ with Sharpeness"
 
 # Function to load the selected model
 def load_selected_model(model_name):
     if model_name == ModelName.unet:
-        return load_model('models/model_best_checkpoint_unet.h5', custom_objects={'bce_dice_loss': bce_dice_loss, 'iou_metric': iou_metric})
+        return load_model('models/model_best_checkpoint_unet_agumentaion.h5', custom_objects={'bce_dice_loss': bce_dice_loss, 'iou_metric': iou_metric})
     elif model_name == ModelName.unetpp:
-        return load_model('models/model_best_checkpoint_unet++.h5', custom_objects={'bce_dice_loss': bce_dice_loss, 'iou_metric': iou_metric})
-    elif model_name == ModelName.model3:
-        # Load your third model here
-        pass
+        return load_model('models/model_best_checkpoint_unet++_agumentation.h5', custom_objects={'bce_dice_loss': bce_dice_loss, 'iou_metric': iou_metric})
+    elif model_name == ModelName.unetpp_s:
+        return load_model('models/model_best_checkpoint_unet++sharpness_agumentation.h5', custom_objects={'bce_dice_loss': bce_dice_loss, 'iou_metric': iou_metric})
 
 # Sidebar for selecting the model
-model_option = st.sidebar.selectbox("Select Model", ["Unet", "Unet++", "Model 3"])
+model_option = st.sidebar.selectbox("Select Model", [ModelName.unet, ModelName.unetpp, ModelName.unetpp_s])
 
 # Load the selected model
 model = load_selected_model(model_option)
