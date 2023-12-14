@@ -29,7 +29,8 @@ def load_selected_model(model_name):
         return model
 
 # Sidebar for selecting the model
-model_option = st.sidebar.selectbox("Select Model", [ModelName.unet, ModelName.unetpp, ModelName.unetpp_s])
+st.sidebar.title("Select Model")
+model_option = st.sidebar.selectbox("Choose a model from the list below", [ModelName.unet.value, ModelName.unetpp.value, ModelName.unetpp_s.value])
 
 # Load the selected model
 model = load_selected_model(model_option)
