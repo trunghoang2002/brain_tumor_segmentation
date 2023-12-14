@@ -4,13 +4,36 @@ import streamlit as st
 import numpy as np
 from PIL import Image
 import io
+from enum import Enum
 
-# Load model
-model = load_model('models/model_best_checkpoint_unet.h5', custom_objects={'bce_dice_loss': bce_dice_loss,'iou_metric':iou_metric}) #or compile = False)
+# Set page title
+st.title("Brain tumor segmentation")
+st.write("This app segments brain tumors from MRI images")
+
+# default value for input parameter
+class ModelName(str, Enum):
+    unet = "Unet"
+    unetpp = "Unet++"
+    model3 = "Model 3"
+
+# Function to load the selected model
+def load_selected_model(model_name):
+    if model_name == ModelName.unet:
+        return load_model('models/model_best_checkpoint_unet.h5', custom_objects={'bce_dice_loss': bce_dice_loss, 'iou_metric': iou_metric})
+    elif model_name == ModelName.unetpp:
+        return load_model('models/model_best_checkpoint_unet++.h5', custom_objects={'bce_dice_loss': bce_dice_loss, 'iou_metric': iou_metric})
+    elif model_name == ModelName.model3:
+        # Load your third model here
+        pass
+
+# Sidebar for selecting the model
+model_option = st.sidebar.selectbox("Select Model", ["Unet", "Unet++", "Model 3"])
+
+# Load the selected model
+model = load_selected_model(model_option)
 THRESHOLD = 0.2
-temp = np.ones((128, 128, 1)).astype("float32")# / 255
 
-st.title("Brain tumor segmentation with U-Net")
+# Main content
 uploaded_file = st.file_uploader("Upload an image to process...", type=["png", "jpg", "jpeg"])
 
 if uploaded_file is not None:
@@ -26,9 +49,8 @@ if uploaded_file is not None:
 
     # Tạo một mảng mask để xác định vị trí màu trắng trong hình ảnh
     white_mask = np.all(prediction == [255, 255, 255], axis=-1)
-    # Thay thế các điểm màu trắng bằng màu hồng trong mảng mới
-    # prediction[white_mask] = [255, 129, 255]
-    
+
+    # Thay thế các điểm màu trắng bằng màu đỏ trong kết quả
     result_image = image_array.reshape((128, 128))
     result_image = np.stack((result_image,) * 3, axis=-1)
     result_image[white_mask] = [219, 0, 0]
@@ -40,6 +62,3 @@ if uploaded_file is not None:
     col2.header("Prediction")
     col1.image(image, use_column_width=True)
     col2.image(result_image, use_column_width=True)
-
-    # st.image(image, caption="Original", use_column_width=True)
-    # st.image(prediction, caption="Prediction", use_column_width=True)
